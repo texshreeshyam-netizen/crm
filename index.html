@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SR CRM">
+<meta name="theme-color" content="#1565C0">
+<title>Signature Realty CRM V10</title>
+<style>
+:root{
+  --primary:#1565C0;--primary-dark:#0D47A1;--primary-light:#E3F2FD;
+  --accent:#FF6F00;--success:#2E7D32;--error:#C62828;--warning:#F57F17;
+  --bg:#F5F7FA;--card:#FFFFFF;--border:#E0E0E0;
+  --text:#1A1A2E;--text-secondary:#666;
+  --shadow:0 2px 12px rgba(0,0,0,0.10);--radius:12px;--font:'Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:20px}
+.login-card{background:#fff;border-radius:20px;padding:40px 32px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center}
+.login-logo{font-size:42px;margin-bottom:8px}
+.login-title{font-size:22px;font-weight:700;color:var(--primary);margin-bottom:4px}
+.login-subtitle{font-size:13px;color:var(--text-secondary);margin-bottom:28px}
+/* APP SHELL */
+#appShell{display:none;flex-direction:column;min-height:100vh}
+/* TOPBAR */
+.topbar{background:var(--primary);color:#fff;display:flex;align-items:center;padding:0 16px;height:56px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.topbar-title{font-size:17px;font-weight:700;flex:1;margin-left:12px}
+.topbar-btn{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:8px;border-radius:8px;line-height:1}
+/* BOTTOM NAV */
+.bottom-nav{background:#fff;border-top:1px solid var(--border);display:flex;position:fixed;bottom:0;left:0;right:0;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;cursor:pointer;border:none;background:none;color:var(--text-secondary);font-size:10px;gap:3px;transition:color 0.2s}
+.nav-item.active{color:var(--primary)}
+.nav-item span{font-size:20px;line-height:1}
+/* MAIN CONTENT */
+.main-content{flex:1;padding:16px;padding-bottom:80px;overflow-y:auto}
+/* PAGES */
+.page{display:none}.page.active{display:block}
+/* FORM ELEMENTS */
+.form-group{margin-bottom:14px}
+label{font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px}
+input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);background:#fff;color:var(--text);transition:border 0.2s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,101,192,0.1)}
+textarea{resize:vertical;min-height:80px}
+/* BUTTONS */
+.btn{padding:12px 20px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all 0.2s;font-family:var(--font)}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:active{background:var(--primary-dark)}
+.btn-success{background:var(--success);color:#fff}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-danger{background:var(--error);color:#fff}
+.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:8px}
+.btn-full{width:100%;justify-content:center}
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:700}
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.kpi-card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border-left:4px solid var(--primary)}
+.kpi-card.hot{border-color:var(--error)}.kpi-card.success{border-color:var(--success)}.kpi-card.warning{border-color:var(--warning)}
+.kpi-val{font-size:26px;font-weight:800;color:var(--text)}
+.kpi-lbl{font-size:11px;color:var(--text-secondary);margin-top:2px}
+/* LIST ITEMS */
+.list-item{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:transform 0.1s}
+.list-item:active{transform:scale(0.98)}
+.list-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.list-body{flex:1;min-width:0}
+.list-name{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-sub{font-size:12px;color:var(--text-secondary);margin-top:2px}
+/* BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px}
+.badge-hot{background:#FFEBEE;color:#C62828}.badge-warm{background:#FFF8E1;color:#F57F17}
+.badge-cold{background:#E3F2FD;color:#1565C0}.badge-closed{background:#E8F5E9;color:#2E7D32}
+.badge-new{background:#F3E5F5;color:#6A1B9A}.badge-active{background:#E0F7FA;color:#006064}
+.badge-verified{background:#E8F5E9;color:#1B5E20}.badge-lost{background:#FCE4EC;color:#880E4F}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;animation:slideUp 0.3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:#E0E0E0;border-radius:2px;margin:10px auto 0}
+.modal-header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1}
+.modal-title{font-size:17px;font-weight:700}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);padding:4px;border-radius:8px}
+.modal-body{padding:16px 20px 32px}
+/* TABS */
+.tabs{display:flex;gap:4px;background:#F0F4FF;border-radius:12px;padding:4px;margin-bottom:16px}
+.tab{flex:1;padding:8px;text-align:center;border-radius:9px;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-secondary);transition:all 0.2s}
+.tab.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(21,101,192,0.3)}
+/* SEARCH */
+.search-bar{display:flex;gap:8px;margin-bottom:14px}
+.search-input{flex:1;padding:11px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:#fff}
+/* STATUS FILTER */
+.status-filter{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.status-filter::-webkit-scrollbar{display:none}
+.filter-pill{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:#fff;color:var(--text-secondary);flex-shrink:0}
+.filter-pill.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+/* TOAST */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#323232;color:#fff;padding:11px 20px;border-radius:24px;font-size:13px;font-weight:600;z-index:1000;opacity:0;transition:all 0.3s;white-space:nowrap;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.success{background:var(--success)}
+#toast.error{background:var(--error)}
+/* LOADING */
+#loadingOverlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.85);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+#loadingOverlay.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px 24px;color:var(--text-secondary)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state h3{font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)}
+/* FAB */
+.fab{position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(255,111,0,0.4);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform 0.2s}
+.fab:active{transform:scale(0.92)}
+/* FORM SECTION */
+.form-section-title{font-size:13px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;padding:8px 0 10px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* DETAIL VIEW */
+.detail-field{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F5F5F5;align-items:center}
+.detail-label{font-size:12px;color:var(--text-secondary);font-weight:600}
+.detail-value{font-size:13px;font-weight:600;text-align:right;max-width:60%}
+/* PIPELINE */
+.pipeline-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F5F5F5}
+.pipeline-stage{font-size:13px;font-weight:600}
+.pipeline-count{font-size:14px;font-weight:800;color:var(--primary);background:var(--primary-light);padding:2px 10px;border-radius:20px}
+/* WHATSAPP */
+.wa-btn{background:#25D366;color:#fff;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
+/* ACTION ROW */
+.action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+/* SETUP BANNER */
+.setup-banner{background:#FFF8E1;border:1.5px solid var(--warning);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.setup-banner h3{color:var(--warning);font-size:15px;margin-bottom:8px}
+.setup-banner ol{font-size:13px;padding-left:18px;color:var(--text-secondary);line-height:1.9}
+.setup-banner code{background:#FFE082;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:13px}
+@media(max-width:380px){.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN SCREEN ════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">🏠</div>
+    <div class="login-title">Signature Realty</div>
+    <div class="login-subtitle">CRM V10 — Team Portal</div>
+    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"></div>
+    <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Login →</button>
+    <p style="margin-top:16px;font-size:12px;color:var(--text-secondary)">Default: admin@signaturerealty.com / Admin@123</p>
+  </div>
+</div>
+
+<!-- ════ APP SHELL ════ -->
+<div id="appShell">
+  <div class="topbar">
+    <button class="topbar-btn" onclick="toggleUserInfo()">☰</button>
+    <span class="topbar-title" id="pageTitle">Dashboard</span>
+    <button class="topbar-btn" onclick="doLogout()">⏻</button>
+  </div>
+
+  <div class="main-content" id="mainContent">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div id="setupBanner" style="display:none">
+        <div class="setup-banner">
+          <h3>⚠️ First-Time Setup Required</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">Sheets not found. Run <code>setupCRM()</code> once:</p>
+          <ol><li>script.google.com → project open karo</li><li>Function: <code>setupCRM</code> select karo</li><li>▶ Run → Authorize → Done!</li><li>Yahan refresh karo</li></ol>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-val" id="kpi-totalLeads">—</div><div class="kpi-lbl">Total Leads</div></div>
+        <div class="kpi-card hot"><div class="kpi-val" id="kpi-hotLeads">—</div><div class="kpi-lbl">🔥 Hot Leads</div></div>
+        <div class="kpi-card success"><div class="kpi-val" id="kpi-closedLeads">—</div><div class="kpi-lbl">✅ Closed Deals</div></div>
+        <div class="kpi-card warning"><div class="kpi-val" id="kpi-inventory">—</div><div class="kpi-lbl">🏠 Available Props</div></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-color:#7B1FA2"><div class="kpi-val" id="kpi-activeLeads">—</div><div class="kpi-lbl">🟣 Active Leads</div></div>
+        <div class="kpi-card" style="border-color:#0097A7"><div class="kpi-val" id="kpi-conversion">—%</div><div class="kpi-lbl">📈 Conversion</div></div>
+        <div class="kpi-card success"><div class="kpi-val" id="kpi-monthlyRev">—</div><div class="kpi-lbl">💰 Monthly Rev.</div></div>
+        <div class="kpi-card warning"><div class="kpi-val" id="kpi-pendingComm">—</div><div class="kpi-lbl">⏳ Pending Comm.</div></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-color:#455A64"><div class="kpi-val" id="kpi-newMonth">—</div><div class="kpi-lbl">🆕 New/Month</div></div>
+        <div class="kpi-card hot"><div class="kpi-val" id="kpi-stale">—</div><div class="kpi-lbl">⚠️ Stale Props</div></div>
+        <div class="kpi-card" style="border-color:#1565C0"><div class="kpi-val" id="kpi-pendingDeals">—</div><div class="kpi-lbl">🤝 Pending Deals</div></div>
+        <div class="kpi-card" style="border-color:#2E7D32"><div class="kpi-val" id="kpi-avgDeal">—</div><div class="kpi-lbl">📊 Avg Deal</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📅 Today's Site Visits</span></div>
+        <div id="todayVisitsList"><div style="font-size:13px;color:var(--text-secondary)">Loading…</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">⏰ Overdue Follow-ups</span><button class="btn btn-sm btn-outline" onclick="showPage('leads')">View All</button></div>
+        <div id="followUpList"><div style="font-size:13px;color:var(--text-secondary)">Loading…</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📊 Lead Pipeline</span></div>
+        <div id="pipelineList"><div class="spinner" style="margin:16px auto"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🔽 Conversion Funnel</span></div>
+        <div id="funnelList"><div style="font-size:13px;color:var(--text-secondary)">Loading…</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🕐 Recent Activities</span></div>
+        <div id="activityList"><div style="font-size:13px;color:var(--text-secondary)">Loading…</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">💰 Revenue Trend (6 Months)</span></div>
+        <div id="revenueTrend"><div style="font-size:13px;color:var(--text-secondary)">Loading…</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🏠 Inventory Snapshot</span></div>
+        <div id="inventorySnapshot"><div style="font-size:13px;color:var(--text-secondary)">Loading…</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🏆 Agent Performance</span></div>
+        <div id="agentPerf"><div style="font-size:13px;color:var(--text-secondary)">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div class="page" id="page-leads">
+      <div class="search-bar"><input class="search-input" id="leadSearch" placeholder="🔍 Name / Phone / ID…" oninput="filterLeads()"></div>
+      <div class="status-filter" id="leadStatusFilter">
+        <div class="filter-pill active" onclick="setLeadFilter('',this)">All</div>
+        <div class="filter-pill" onclick="setLeadFilter('New',this)">New</div>
+        <div class="filter-pill" onclick="setLeadFilter('Telecalling',this)">Telecalling</div>
+        <div class="filter-pill" onclick="setLeadFilter('Interested',this)">Interested</div>
+        <div class="filter-pill" onclick="setLeadFilter('Verified',this)">Verified</div>
+        <div class="filter-pill" onclick="setLeadFilter('Requirement Filled',this)">Req. Filled</div>
+        <div class="filter-pill" onclick="setLeadFilter('Matched',this)">Matched</div>
+        <div class="filter-pill" onclick="setLeadFilter('Shortlisted',this)">Shortlisted</div>
+        <div class="filter-pill" onclick="setLeadFilter('Site Visit Scheduled',this)">Visit Sched.</div>
+        <div class="filter-pill" onclick="setLeadFilter('Site Visited',this)">Visited</div>
+        <div class="filter-pill" onclick="setLeadFilter('Negotiating',this)">Negotiating</div>
+        <div class="filter-pill" onclick="setLeadFilter('Closed',this)">Closed</div>
+        <div class="filter-pill" onclick="setLeadFilter('Lost',this)">Lost</div>
+      </div>
+      <div id="leadList"><div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div></div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div class="page" id="page-inventory">
+      <div class="search-bar"><input class="search-input" id="invSearch" placeholder="🔍 Address / Property ID…" oninput="filterInventory()"></div>
+      <div class="status-filter" id="invStatusFilter">
+        <div class="filter-pill active" onclick="setInvFilter('',this)">All</div>
+        <div class="filter-pill" onclick="setInvFilter('Available',this)">Available</div>
+        <div class="filter-pill" onclick="setInvFilter('Hold',this)">Hold</div>
+        <div class="filter-pill" onclick="setInvFilter('Sold',this)">Sold</div>
+        <div class="filter-pill" onclick="setInvFilter('Rented',this)">Rented</div>
+        <div class="filter-pill" onclick="setInvFilter('Owner',this)">Owner</div>
+        <div class="filter-pill" onclick="setInvFilter('Agent-Broker',this)">Broker</div>
+        <div class="filter-pill" onclick="setInvFilter('Builder-Developer',this)">Builder</div>
+      </div>
+      <div id="invList"><div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div></div>
+    </div>
+
+    <!-- AGENT MODULE -->
+    <div class="page" id="page-agent">
+      <div class="tabs">
+        <button class="tab active" onclick="agentTab('Dena',this)">🏠 Dena</button>
+        <button class="tab" onclick="agentTab('Lena',this)">🤝 Lena</button>
+        <button class="tab" onclick="agentTab('Projects',this)">🏗️ Projects</button>
+      </div>
+      <!-- Dena -->
+      <div id="agentDena">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">Submit New Property</div>
+          <div class="form-section-title">Property Details</div>
+          <div class="form-group"><label>Full Address *</label><input id="d-addr" placeholder="Society, Area, City"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Category *</label><select id="d-cat"><option>Residential</option><option>Commercial</option><option>Land/Plot</option><option>Industrial</option></select></div>
+            <div class="form-group"><label>Transaction *</label><select id="d-tx"><option>Sale</option><option>Rent</option><option>Lease</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Listing Type *</label><select id="d-lt" onchange="toggleDenaLabel()"><option>Owner</option><option>Agent-Broker</option></select></div>
+            <div class="form-group"><label>BHK</label><input type="number" id="d-bhk" placeholder="3"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Carpet Area (sqft)</label><input type="number" id="d-area" placeholder="1200"></div>
+            <div class="form-group"><label>Price (₹) *</label><input type="number" id="d-price" placeholder="7500000"></div>
+          </div>
+          <div class="form-section-title" id="denaContactLabel">Owner Contact</div>
+          <div class="form-row">
+            <div class="form-group"><label>Name *</label><input id="d-oname" placeholder="Name"></div>
+            <div class="form-group"><label>Phone *</label><input type="tel" id="d-ophone" placeholder="9XXXXXXXXX"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Furnishing</label><select id="d-furn"><option>Unfurnished</option><option>Semi-Furnished</option><option>Fully Furnished</option></select></div>
+            <div class="form-group"><label>Possession</label><select id="d-poss"><option>Ready to Move</option><option>Under Construction</option><option>6 months</option><option>1+ Year</option></select></div>
+          </div>
+          <div class="form-group"><label>Remarks</label><textarea id="d-notes" placeholder="Special points, notes…" style="min-height:60px"></textarea></div>
+          <button class="btn btn-primary btn-full" onclick="submitDena()">Submit Property</button>
+        </div>
+      </div>
+      <!-- Lena -->
+      <div id="agentLena" style="display:none">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:6px">Submit Against Requirement</div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px">ShareID daalo jo client ne diya hai.</p>
+          <div class="form-group"><label>Share ID *</label><input id="l-shareid" placeholder="SHARE-XXXX" style="font-family:monospace;font-size:16px;text-transform:uppercase"></div>
+          <button class="btn btn-outline btn-full" style="margin-bottom:14px" onclick="previewRequirement()">Preview Requirement</button>
+          <div id="reqPreviewBox" style="display:none;background:var(--primary-light);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px"></div>
+          <div class="form-section-title">Your Property</div>
+          <div class="form-group"><label>Full Address *</label><input id="l-addr" placeholder="Society, Area, City"></div>
+          <div class="form-row">
+            <div class="form-group"><label>BHK</label><input type="number" id="l-bhk" placeholder="3"></div>
+            <div class="form-group"><label>Price (₹) *</label><input type="number" id="l-price" placeholder="7500000"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Your Name *</label><input id="l-agname" placeholder="Agent Name"></div>
+            <div class="form-group"><label>Your Phone *</label><input type="tel" id="l-agphone" placeholder="9XXXXXXXXX"></div>
+          </div>
+          <div class="form-group"><label>Notes</label><textarea id="l-notes" placeholder="Highlights…" style="min-height:60px"></textarea></div>
+          <button class="btn btn-primary btn-full" onclick="submitLena()">Submit for Requirement</button>
+        </div>
+      </div>
+      <!-- Projects -->
+      <div id="agentProjects" style="display:none">
+        <div id="projectsList"><div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">📈 Reports</div>
+        <div style="display:grid;gap:10px">
+          <button class="btn btn-outline btn-full" onclick="runReport('leads')">📋 Lead Report</button>
+          <button class="btn btn-outline btn-full" onclick="runReport('inventory')">🏠 Inventory Report</button>
+          <button class="btn btn-outline btn-full" onclick="runReport('revenue')">💰 Revenue Report</button>
+          <button class="btn btn-outline btn-full" onclick="runReport('commissions')">🤝 Commission Report</button>
+          <button class="btn btn-outline btn-full" onclick="runReport('builder')">🏗️ Builder Projects Report</button>
+          <button class="btn btn-outline btn-full" onclick="runReport('monthly')">📅 Monthly Summary</button>
+        </div>
+      </div>
+      <div id="reportResult" style="display:none"><div class="card" id="reportContent"></div></div>
+    </div>
+
+  </div><!-- /main-content -->
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')"><span>📊</span>Dashboard</button>
+    <button class="nav-item" id="nav-leads" onclick="showPage('leads')"><span>👥</span>Leads</button>
+    <button class="nav-item" id="nav-inventory" onclick="showPage('inventory')"><span>🏠</span>Inventory</button>
+    <button class="nav-item" id="nav-agent" onclick="showPage('agent')"><span>🤝</span>Agent</button>
+    <button class="nav-item" id="nav-reports" onclick="showPage('reports')"><span>📈</span>Reports</button>
+  </nav>
+</div><!-- /appShell -->
+
+<button class="fab" id="fabBtn" style="display:none" onclick="openFab()">+</button>
+
+<!-- MODAL: Add Lead -->
+<div class="modal-overlay" id="addLeadModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><span class="modal-title">➕ Add New Lead</span><button class="modal-close" onclick="closeModal('addLeadModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-section-title">Client Details</div>
+      <div class="form-group"><label>Full Name *</label><input id="al-name" placeholder="Client Full Name"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Primary Phone *</label><input type="tel" id="al-phone" placeholder="9XXXXXXXXX"></div>
+        <div class="form-group"><label>WhatsApp</label><input type="tel" id="al-wa" placeholder="Same if same"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input type="email" id="al-email" placeholder="email@example.com"></div>
+        <div class="form-group"><label>Source *</label>
+          <select id="al-source"><option>Walk-in</option><option>Phone Call</option><option>WhatsApp</option><option>Reference</option><option>Portal - MagicBricks</option><option>Portal - 99acres</option><option>Portal - Housing</option><option>Social Media</option><option>Manual</option></select>
+        </div>
+      </div>
+      <div class="form-section-title">Classification</div>
+      <div class="form-row">
+        <div class="form-group"><label>Lead Type *</label>
+          <select id="al-leadtype"><option>End User</option><option>Investor</option><option>NRI</option><option>Corporate</option><option>Broker Referral</option></select>
+        </div>
+        <div class="form-group"><label>Transaction *</label><select id="al-tx"><option>Sale</option><option>Rent</option><option>Lease</option></select></div>
+      </div>
+      <div class="form-section-title">Requirement</div>
+      <div class="form-group"><label>Category</label><select id="al-cat"><option>Residential</option><option>Commercial</option><option>Land/Plot</option><option>Industrial</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label>Budget Min (₹)</label><input type="number" id="al-bmin" placeholder="3000000"></div>
+        <div class="form-group"><label>Budget Max (₹)</label><input type="number" id="al-bmax" placeholder="7000000"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Location Pref 1 *</label><input id="al-loc1" placeholder="Bandra"></div>
+        <div class="form-group"><label>Location Pref 2</label><input id="al-loc2" placeholder="Andheri"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>BHK Min</label><input type="number" id="al-bhkmin" placeholder="2"></div>
+        <div class="form-group"><label>BHK Max</label><input type="number" id="al-bhkmax" placeholder="3"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Urgency</label><select id="al-urgency"><option>Immediate</option><option>Within 1 Month</option><option>1-3 Months</option><option>3-6 Months</option><option>6+ Months</option><option>Just Exploring</option></select></div>
+        <div class="form-group"><label>Funding</label><select id="al-funding"><option>Self-Funded</option><option>Home Loan</option><option>Corporate Funding</option><option>NRI Remittance</option><option>Not Decided</option></select></div>
+      </div>
+      <div class="form-group"><label>Special Notes</label><textarea id="al-notes" placeholder="Any specific requirements…" style="min-height:60px"></textarea></div>
+      <button class="btn btn-primary btn-full" onclick="saveLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Property -->
+<div class="modal-overlay" id="addPropertyModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><span class="modal-title">🏠 Add Property</span><button class="modal-close" onclick="closeModal('addPropertyModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Listing Type *</label><select id="ap-lt"><option>Owner</option><option>Agent-Broker</option><option>Builder-Developer</option></select></div>
+        <div class="form-group"><label>Transaction *</label><select id="ap-tx"><option>Sale</option><option>Rent</option><option>Lease</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Category *</label><select id="ap-cat"><option>Residential</option><option>Commercial</option><option>Land/Plot</option><option>Industrial</option></select></div>
+        <div class="form-group"><label>BHK</label><input type="number" id="ap-bhk" placeholder="3"></div>
+      </div>
+      <div class="form-group"><label>Full Address *</label><input id="ap-addr" placeholder="Wing A, Society, Area, City"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Carpet Area (sqft)</label><input type="number" id="ap-area" placeholder="1200"></div>
+        <div class="form-group"><label>Floor</label><input type="number" id="ap-floor" placeholder="5"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Price (₹) *</label><input type="number" id="ap-price" placeholder="7500000"></div>
+        <div class="form-group"><label>Furnishing</label><select id="ap-furn"><option>Unfurnished</option><option>Semi-Furnished</option><option>Fully Furnished</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Owner/Broker Name *</label><input id="ap-oname" placeholder="Name"></div>
+        <div class="form-group"><label>Phone *</label><input type="tel" id="ap-ophone" placeholder="9XXXXXXXXX"></div>
+      </div>
+      <div class="form-group"><label>Possession</label><select id="ap-poss"><option>Ready to Move</option><option>Under Construction</option><option>6 months</option><option>1+ Year</option></select></div>
+      <div class="form-group"><label>Remarks</label><textarea id="ap-notes" style="min-height:60px" placeholder="Highlights…"></textarea></div>
+      <button class="btn btn-primary btn-full" onclick="saveProperty()">Save Property</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Lead Detail -->
+<div class="modal-overlay" id="leadDetailModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><span class="modal-title" id="ldm-title">Lead Detail</span><button class="modal-close" onclick="closeModal('leadDetailModal')">✕</button></div>
+    <div class="modal-body" id="ldm-body"></div>
+  </div>
+</div>
+
+<!-- MODAL: Property Detail -->
+<div class="modal-overlay" id="propDetailModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><span class="modal-title" id="pdm-title">Property Detail</span><button class="modal-close" onclick="closeModal('propDetailModal')">✕</button></div>
+    <div class="modal-body" id="pdm-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="loadingOverlay"><div class="spinner"></div><span style="font-size:13px;color:var(--text-secondary)">Please wait…</span></div>
+
+<script>
+// ── STATE
+var currentUser=null, allLeads=[], filteredLeads=[], allInventory=[], filteredInv=[];
+var leadStatusFilter='', invStatusFilter='', currentPage='dashboard';
+
+// ── UTILS
+function val(id){return (document.getElementById(id)||{}).value||'';}
+function setHtml(id,html){var e=document.getElementById(id);if(e)e.innerHTML=html;}
+function showLoading(on){document.getElementById('loadingOverlay').classList.toggle('show',on);}
+function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},3500);}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function fmtCur(n){return n?'₹'+Number(n).toLocaleString('en-IN'):'—';}
+function fmtDate(d){if(!d)return '—';var x=new Date(d);return isNaN(x)?d:x.toLocaleDateString('en-IN');}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtCrLk(n){n=Number(n)||0;if(n>=10000000)return (Math.round(n/100000)/100)+'Cr';if(n>=100000)return Math.round(n/100000*10)/10+'L';if(n>=1000)return Math.round(n/1000)+'K';return n?String(n):'—';}
+function statusBadge(s){if(!s)return '';var cls=s==='Closed'?'closed':s==='New'?'new':s==='Lost'||s==='Invalid'?'lost':s==='Verified'?'verified':['Negotiating','Token Received','Deal Confirmed'].indexOf(s)!==-1?'hot':['Interested','Shortlisted','Matched','Site Visited'].indexOf(s)!==-1?'warm':'active';return '<span class="badge badge-'+cls+'">'+s+'</span>';}
+function scoreBadge(s){return s?'<span class="badge badge-'+(s==='Hot'?'hot':s==='Warm'?'warm':'cold')+'">'+s+'</span>':'';}
+function availBadge(s){return s?'<span class="badge badge-'+(s==='Available'?'verified':s==='Hold'?'warm':'lost')+'">'+s+'</span>':'';}
+
+// ── AUTH
+function doLogin(){
+  var email=val('loginEmail'),pass=val('loginPassword');
+  if(!email||!pass){showToast('Email & password required','error');return;}
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);if(res&&res.success){currentUser=res.data;bootApp();}else showToast((res&&res.message)||'Login failed','error');})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message||'Login error','error');})
+    .login(email,pass);
+}
+document.getElementById('loginPassword').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+
+function doLogout(){
+  if(!confirm('Logout?'))return;
+  google.script.run.logout();
+  currentUser=null;
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+}
+
+function bootApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='flex';
+  showPage('dashboard');
+  loadDashboard();
+  loadLeads();
+  loadInventory();
+  loadProjects();
+}
+
+function toggleUserInfo(){showToast('User: '+(currentUser&&currentUser.name||'—')+' | Role: '+(currentUser&&currentUser.role||'—'),'');}
+
+// ── NAVIGATION
+var pageTitles={dashboard:'📊 Dashboard',leads:'👥 Leads',inventory:'🏠 Inventory',agent:'🤝 Agent Module',reports:'📈 Reports'};
+function showPage(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
+  var el=document.getElementById('page-'+p);if(el)el.classList.add('active');
+  var nav=document.getElementById('nav-'+p);if(nav)nav.classList.add('active');
+  document.getElementById('pageTitle').textContent=pageTitles[p]||p;
+  document.getElementById('fabBtn').style.display=(p==='leads'||p==='inventory')?'flex':'none';
+  currentPage=p;
+}
+function openFab(){if(currentPage==='leads')openModal('addLeadModal');else if(currentPage==='inventory')openModal('addPropertyModal');}
+
+// ── DASHBOARD
+function loadDashboard(){
+  google.script.run
+    .withSuccessHandler(function(res){
+      if(!res||!res.success){
+        showToast('Dashboard error: '+(res&&res.message||'unknown'),'error');
+        return;
+      }
+      var d=res.data;
+
+      // Setup required banner
+      if(d.setupRequired){
+        document.getElementById('setupBanner').style.display='block';
+        return;
+      }
+      document.getElementById('setupBanner').style.display='none';
+
+      var k=d.kpis||{};
+      // Row 1
+      document.getElementById('kpi-totalLeads').textContent=k.totalLeads||0;
+      document.getElementById('kpi-hotLeads').textContent=k.hotLeads||0;
+      document.getElementById('kpi-closedLeads').textContent=k.closedLeads||0;
+      document.getElementById('kpi-inventory').textContent=k.availableProperties||0;
+      // Row 2
+      document.getElementById('kpi-activeLeads').textContent=k.activeLeads||0;
+      document.getElementById('kpi-conversion').textContent=(k.conversionRate||0)+'%';
+      document.getElementById('kpi-monthlyRev').textContent=fmtCrLk(k.monthlyRevenue||0);
+      document.getElementById('kpi-pendingComm').textContent=fmtCrLk(k.pendingCommission||0);
+      // Row 3
+      document.getElementById('kpi-newMonth').textContent=k.newLeadsThisMonth||0;
+      document.getElementById('kpi-stale').textContent=k.staleProperties||0;
+      document.getElementById('kpi-pendingDeals').textContent=k.pendingDeals||0;
+      document.getElementById('kpi-avgDeal').textContent=fmtCrLk(k.avgDealValue||0);
+
+      // Today's Visits
+      var tv=d.todaysVisits||[];
+      setHtml('todayVisitsList',tv.length?tv.map(function(v){return '<div class="list-item"><div class="list-avatar" style="background:#E8F5E9">🗓️</div><div class="list-body"><div class="list-name">'+(v.LeadID||'—')+' → '+(v.PropertyID||'—')+'</div><div class="list-sub">'+(v.ScheduledTime||'All day')+' · '+(v.Agent||'—')+'</div></div></div>';}).join(''):'<div style="font-size:13px;color:var(--text-secondary);padding:8px 0">📭 No site visits today</div>');
+
+      // Follow-ups
+      var fu=d.pendingFollowUps||[];
+      setHtml('followUpList',fu.length?fu.slice(0,5).map(function(l){var days=l.DaysOverdue||0;var col=days>=7?'var(--error)':days>=3?'var(--warning)':'var(--text-secondary)';return '<div class="list-item" onclick="viewLead(\''+escHtml(l.LeadID||'')+'\')"><div class="list-avatar" style="background:var(--primary-light)">👤</div><div class="list-body"><div class="list-name">'+escHtml(l.FullName||'Unknown')+'</div><div class="list-sub">'+statusBadge(l.LeadStatus)+' · <span style="color:'+col+';font-weight:700">'+days+' days overdue</span></div></div>'+scoreBadge(l.ScoreCategory)+'</div>';}).join(''):'<div style="font-size:13px;color:var(--success);padding:8px 0">✅ No overdue follow-ups</div>');
+
+      // Pipeline
+      var pipeline=d.pipeline||[];
+      setHtml('pipelineList',pipeline.length?pipeline.map(function(p){var pct=k.totalLeads>0?Math.round((p.count/k.totalLeads)*100):0;return '<div class="pipeline-item"><span class="pipeline-stage">'+escHtml(p.stage)+'</span><div style="display:flex;align-items:center;gap:8px"><div style="width:60px;height:6px;background:#EEE;border-radius:3px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:var(--primary);border-radius:3px"></div></div><span class="pipeline-count">'+p.count+'</span></div></div>';}).join(''):'<div class="empty-state" style="padding:20px"><div class="icon">📊</div><h3>No leads yet</h3></div>');
+
+      // Funnel
+      var fn=d.conversionFunnel||[];
+      setHtml('funnelList',fn.length?fn.map(function(f){return '<div class="pipeline-item"><span class="pipeline-stage">'+escHtml(f.stage)+'</span><div style="display:flex;align-items:center;gap:6px"><div style="width:80px;height:7px;background:#EEE;border-radius:4px;overflow:hidden"><div style="width:'+Math.min(f.percent,100)+'%;height:100%;background:var(--primary);border-radius:4px"></div></div><span class="pipeline-count">'+f.count+'</span><span style="font-size:11px;color:var(--text-secondary)">'+f.percent+'%</span></div></div>';}).join(''):'<div style="font-size:13px;color:var(--text-secondary);padding:8px 0">No funnel data</div>');
+
+      // Recent Activities
+      var acts=d.recentActivities||[];
+      setHtml('activityList',acts.length?acts.slice(0,8).map(function(a){return '<div class="pipeline-item"><div><div style="font-size:13px;font-weight:600">'+escHtml(a.Action||a.Type||'Activity')+'</div><div style="font-size:11px;color:var(--text-secondary)">'+escHtml(a.LeadID||'')+' · '+escHtml(a.UserID||a.Agent||'')+'</div></div><span style="font-size:11px;color:var(--text-secondary)">'+fmtDate(a.Date||a.Timestamp||a.CreatedDate)+'</span></div>';}).join(''):'<div style="font-size:13px;color:var(--text-secondary);padding:8px 0">No recent activities</div>');
+
+      // Revenue Trend
+      var rev=d.revenue||[];
+      if(rev.length){
+        var maxR=Math.max.apply(null,rev.map(function(r){return r.revenue||0;}))||1;
+        setHtml('revenueTrend','<div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px">'+rev.map(function(r){var h=Math.max(4,Math.round(((r.revenue||0)/maxR)*72));return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-size:9px;color:var(--text-secondary)">'+fmtCrLk(r.revenue||0)+'</span><div style="width:100%;height:'+h+'px;background:var(--primary);border-radius:4px 4px 0 0;opacity:'+(r.revenue?1:0.2)+'"></div><span style="font-size:9px;color:var(--text-secondary);white-space:nowrap">'+escHtml(r.month||'')+'</span></div>';}).join('')+'</div>'+rev.map(function(r){return '<div class="pipeline-item"><span class="pipeline-stage">'+escHtml(r.month||'')+'</span><div style="text-align:right"><span class="pipeline-count">'+fmtCur(r.revenue||0)+'</span><br><span style="font-size:11px;color:var(--text-secondary)">'+(r.deals||0)+' deals</span></div></div>';}).join(''));
+      } else setHtml('revenueTrend','<div style="font-size:13px;color:var(--text-secondary);padding:8px 0">No revenue data yet</div>');
+
+      // Inventory Snapshot
+      var inv=d.inventorySnapshot||{};
+      var iHtml='';
+      if(inv.byListingType){iHtml+='<div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">By Listing Type</div>';Object.keys(inv.byListingType).forEach(function(k){if(inv.byListingType[k])iHtml+='<div class="pipeline-item"><span class="pipeline-stage">'+escHtml(k)+'</span><span class="pipeline-count">'+inv.byListingType[k]+'</span></div>';});}
+      if(inv.byCategory){iHtml+='<div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin:10px 0 6px">By Category</div>';Object.keys(inv.byCategory).forEach(function(k){if(inv.byCategory[k])iHtml+='<div class="pipeline-item"><span class="pipeline-stage">'+escHtml(k)+'</span><span class="pipeline-count">'+inv.byCategory[k]+'</span></div>';});}
+      if(inv.stale!==undefined)iHtml+='<div style="margin-top:8px;font-size:13px;color:var(--warning);font-weight:600">⚠️ Stale (60+ days): '+inv.stale+'</div>';
+      setHtml('inventorySnapshot',iHtml||'<div style="font-size:13px;color:var(--text-secondary);padding:8px 0">No inventory data</div>');
+
+      // Agent Performance
+      var agents=d.agents||[];
+      setHtml('agentPerf',agents.length?agents.map(function(a,i){return '<div class="list-item"><div class="list-avatar" style="background:var(--primary-light);font-size:14px;font-weight:800;color:var(--primary)">'+(i+1)+'</div><div class="list-body"><div class="list-name">'+escHtml(a.name||'Unknown')+'</div><div class="list-sub">Leads: '+a.leads+' · Closed: '+a.closed+' · '+a.conversionRate+'%</div><div class="list-sub">🔥 '+a.hotLeads+' hot · 💰 '+fmtCur(a.commission||0)+'</div></div></div>';}).join(''):'<div style="font-size:13px;color:var(--text-secondary);padding:8px 0">No agent data yet</div>');
+    })
+    .withFailureHandler(function(e){showToast('Dashboard error: '+e.message,'error');})
+    .getDashboardData();
+}
+
+// ── LEADS
+function loadLeads(){
+  google.script.run
+    .withSuccessHandler(function(res){
+      allLeads=(res&&res.success&&res.data&&res.data.data)?res.data.data:(res&&res.success&&Array.isArray(res.data)?res.data:[]);
+      filteredLeads=allLeads;renderLeads();
+    })
+    .withFailureHandler(function(e){showToast('Leads error: '+e.message,'error');})
+    .getAllLeads({pageSize:200});
+}
+function setLeadFilter(s,el){leadStatusFilter=s;document.querySelectorAll('#leadStatusFilter .filter-pill').forEach(function(p){p.classList.remove('active');});if(el)el.classList.add('active');filterLeads();}
+function filterLeads(){
+  var q=val('leadSearch').toLowerCase();
+  filteredLeads=allLeads.filter(function(l){
+    var mQ=!q||(l.FullName||'').toLowerCase().indexOf(q)!==-1||(l.PrimaryPhone||'').indexOf(q)!==-1||(l.LeadID||'').toLowerCase().indexOf(q)!==-1;
+    var mS=!leadStatusFilter||l.LeadStatus===leadStatusFilter;
+    return mQ&&mS;
+  });
+  renderLeads();
+}
+function renderLeads(){
+  if(!filteredLeads.length){setHtml('leadList','<div class="empty-state"><div class="icon">👥</div><h3>No leads found</h3><p>Add with + button</p></div>');return;}
+  setHtml('leadList',filteredLeads.map(function(l){
+    var avatar=l.ScoreCategory==='Hot'?'🔥':l.ScoreCategory==='Warm'?'🌡️':'❄️';
+    var avatarBg=l.ScoreCategory==='Hot'?'#FFEBEE':l.ScoreCategory==='Warm'?'#FFF8E1':'#E3F2FD';
+    return '<div class="list-item" onclick="viewLead(\''+l.LeadID+'\')">'+
+      '<div class="list-avatar" style="background:'+avatarBg+'">'+avatar+'</div>'+
+      '<div class="list-body"><div class="list-name">'+escHtml(l.FullName||'Unknown')+'</div>'+
+      '<div class="list-sub">'+escHtml(l.PrimaryPhone||'')+(l.LocationPref1?' · '+escHtml(l.LocationPref1):'')+'</div>'+
+      '<div class="list-sub" style="margin-top:2px">'+statusBadge(l.LeadStatus)+' '+scoreBadge(l.ScoreCategory)+'</div></div>'+
+      '<div style="text-align:right;flex-shrink:0"><div style="font-size:11px;color:var(--text-secondary)">'+escHtml(l.LeadID||'')+'</div>'+
+      (l.AssignedAgent?'<div style="font-size:11px;color:var(--text-secondary);margin-top:2px">'+escHtml(l.AssignedAgent)+'</div>':'')+
+      '</div></div>';
+  }).join(''));
+}
+
+function viewLead(id){
+  var l=allLeads.find(function(x){return x.LeadID===id;});
+  if(!l){showToast('Lead not found','error');return;}
+  document.getElementById('ldm-title').textContent=escHtml(l.FullName||'Lead Detail');
+  var wa=l.WhatsAppNumber||l.PrimaryPhone||'';
+  var b='<div class="detail-field"><span class="detail-label">Lead ID</span><span class="detail-value" style="font-family:monospace">'+escHtml(l.LeadID)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Status</span><span class="detail-value">'+statusBadge(l.LeadStatus)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Score</span><span class="detail-value">'+scoreBadge(l.ScoreCategory)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Phone</span><span class="detail-value">'+escHtml(l.PrimaryPhone||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Email</span><span class="detail-value">'+escHtml(l.Email||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Source</span><span class="detail-value">'+escHtml(l.Source||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Lead Type</span><span class="detail-value">'+escHtml(l.LeadType||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Transaction</span><span class="detail-value">'+escHtml(l.TransactionType||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Category</span><span class="detail-value">'+escHtml(l.Category||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Budget</span><span class="detail-value">'+fmtCur(l.BudgetMin)+' – '+fmtCur(l.BudgetMax)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Location</span><span class="detail-value">'+escHtml([l.LocationPref1,l.LocationPref2,l.LocationPref3].filter(Boolean).join(', ')||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Urgency</span><span class="detail-value">'+escHtml(l.UrgencyLevel||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Funding</span><span class="detail-value">'+escHtml(l.FundingType||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Agent</span><span class="detail-value">'+escHtml(l.AssignedAgent||'Unassigned')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Calls Made</span><span class="detail-value">'+escHtml(String(l.CallAttemptCount||l.TotalCallsMade||0))+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Last Action</span><span class="detail-value">'+fmtDate(l.LastActionDate)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Next Follow-up</span><span class="detail-value">'+fmtDate(l.NextFollowUpDate)+'</span></div>'+
+    (l.SpecialNotes?'<div class="detail-field"><span class="detail-label">Notes</span><span class="detail-value">'+escHtml(l.SpecialNotes)+'</span></div>':'')+
+    '<div style="margin-top:16px"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">CALL DISPOSITION</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
+    ['No Answer','Call Later','Interested','Not Interested','Invalid'].map(function(d){return '<button class="btn btn-sm '+(d==='Interested'?'btn-success':d==='Not Interested'?'btn-warning':d==='Invalid'?'btn-danger':'btn-outline')+'" onclick="callDisposition(\''+id+'\',\''+d+'\')">'+d+'</button>';}).join('')+'</div></div>'+
+    '<div style="margin-top:14px"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">STATUS UPDATE</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
+    ['Verified','Requirement Filled','Shortlisted','Site Visit Scheduled','Negotiating','Token Received','Deal Confirmed','Closed','Lost'].map(function(s){return '<button class="btn btn-sm btn-outline" onclick="updateLeadStatus(\''+id+'\',\''+s+'\')">'+s+'</button>';}).join('')+'</div></div>'+
+    '<div class="action-row">'+
+    '<a class="wa-btn" href="https://wa.me/91'+escHtml(wa.replace(/\D/g,''))+'?text=Hello+'+encodeURIComponent(l.FullName||'')+'" target="_blank">💬 WhatsApp</a>'+
+    '<button class="btn btn-sm btn-outline" onclick="runMatching(\''+id+'\')">🔍 Matches</button>'+
+    '<button class="btn btn-sm btn-danger" onclick="deleteLead(\''+id+'\')">🗑️ Delete</button>'+
+    '</div>'+
+    '<div style="margin-top:14px"><button class="btn btn-sm btn-outline btn-full" onclick="generateShareLink(\''+id+'\')">🔗 Generate Lena Share ID</button></div>';
+  document.getElementById('ldm-body').innerHTML=b;
+  openModal('leadDetailModal');
+}
+
+function callDisposition(leadId,disposition){
+  var notes='',followUp='';
+  if(disposition==='No Answer'||disposition==='Call Later'){followUp=prompt('Follow-up date (YYYY-MM-DD):')||'';notes=prompt('Notes:')||'';}
+  else if(disposition==='Interested'){notes=prompt('Interest notes:')||'';}
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);showToast(res.success?'Logged: '+disposition:res.message,res.success?'success':'error');if(res.success){closeModal('leadDetailModal');loadLeads();}})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .logCallDisposition(leadId,disposition,notes,followUp);
+}
+function updateLeadStatus(leadId,status){
+  if(!confirm('Status → '+status+'?'))return;
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);showToast(res.success?'Status → '+status:res.message,res.success?'success':'error');if(res.success){closeModal('leadDetailModal');loadLeads();}})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .updateLeadStatus(leadId,status,'');
+}
+function deleteLead(leadId){
+  if(!confirm('Delete this lead permanently?'))return;
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);showToast(res.success?'Lead deleted':res.message,res.success?'success':'error');if(res.success){closeModal('leadDetailModal');loadLeads();}})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .deleteLead(leadId);
+}
+function runMatching(leadId){
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);if(!res.success){showToast(res.message,'error');return;}var m=res.data||[];showToast(m.length+' matches found',m.length?'success':'');if(m.length)alert('Top matches:\n'+m.slice(0,3).map(function(x){return x.PropertyID+' ('+x.score+'pts)';}).join('\n'));})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .findMatchesForLead(leadId);
+}
+function generateShareLink(leadId){
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);if(res.success){showToast('Share ID: '+(res.data&&res.data.shareId),'success');alert('Share ID: '+(res.data&&res.data.shareId)+'\n\nBroker agent ko ye ID do → Agent → Lena tab.');}else showToast(res.message,'error');})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .generateRequirementShareLink(leadId);
+}
+function saveLead(){
+  var data={FullName:val('al-name'),PrimaryPhone:val('al-phone'),WhatsAppNumber:val('al-wa'),Email:val('al-email'),Source:val('al-source'),LeadType:val('al-leadtype'),TransactionType:val('al-tx'),Category:val('al-cat'),BudgetMin:val('al-bmin'),BudgetMax:val('al-bmax'),LocationPref1:val('al-loc1'),LocationPref2:val('al-loc2'),BHKMin:val('al-bhkmin'),BHKMax:val('al-bhkmax'),UrgencyLevel:val('al-urgency'),FundingType:val('al-funding'),SpecialNotes:val('al-notes')};
+  if(!data.FullName||!data.PrimaryPhone){showToast('Name & Phone required','error');return;}
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);if(res.success){showToast('Lead created: '+(res.data&&res.data.LeadID),'success');closeModal('addLeadModal');loadLeads();['al-name','al-phone','al-wa','al-email','al-loc1','al-loc2','al-bmin','al-bmax','al-bhkmin','al-bhkmax','al-notes'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});}else showToast(res.message,'error');})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .createLead(data);
+}
+
+// ── INVENTORY
+function loadInventory(){
+  google.script.run
+    .withSuccessHandler(function(res){allInventory=(res&&res.success&&res.data&&res.data.data)?res.data.data:(res&&res.success&&Array.isArray(res.data)?res.data:[]);filteredInv=allInventory;renderInventory();})
+    .withFailureHandler(function(e){showToast('Inventory error: '+e.message,'error');})
+    .getAllProperties({pageSize:200});
+}
+function setInvFilter(f,el){invStatusFilter=f;document.querySelectorAll('#invStatusFilter .filter-pill').forEach(function(p){p.classList.remove('active');});if(el)el.classList.add('active');filterInventory();}
+function filterInventory(){
+  var q=val('invSearch').toLowerCase();
+  filteredInv=allInventory.filter(function(p){
+    var mQ=!q||(p.FullAddress||'').toLowerCase().indexOf(q)!==-1||(p.PropertyID||'').toLowerCase().indexOf(q)!==-1||(p.ProjectBuildingName||'').toLowerCase().indexOf(q)!==-1;
+    var mS=!invStatusFilter||p.AvailabilityStatus===invStatusFilter||p.ListingType===invStatusFilter;
+    return mQ&&mS;
+  });
+  renderInventory();
+}
+function renderInventory(){
+  if(!filteredInv.length){setHtml('invList','<div class="empty-state"><div class="icon">🏠</div><h3>No properties found</h3><p>Add with + button</p></div>');return;}
+  setHtml('invList',filteredInv.map(function(p){
+    var icon=p.ListingType==='Owner'?'🏠':p.ListingType==='Agent-Broker'?'🤝':'🏗️';
+    return '<div class="list-item" onclick="viewProperty(\''+p.PropertyID+'\')">'+
+      '<div class="list-avatar" style="background:var(--primary-light)">'+icon+'</div>'+
+      '<div class="list-body"><div class="list-name">'+(p.BHK?p.BHK+' BHK ':'')+escHtml(p.Category||'Property')+'</div>'+
+      '<div class="list-sub">'+escHtml(p.FullAddress||'No address')+'</div>'+
+      '<div class="list-sub" style="margin-top:2px">'+availBadge(p.AvailabilityStatus)+' <span class="badge badge-cold">'+escHtml(p.ListingType||'')+'</span></div></div>'+
+      '<div style="text-align:right;flex-shrink:0"><div style="font-weight:800;font-size:14px">'+fmtCur(p.Price)+'</div>'+
+      '<div style="font-size:11px;color:var(--text-secondary)">'+escHtml(p.PropertyID||'')+'</div></div></div>';
+  }).join(''));
+}
+function viewProperty(id){
+  var p=allInventory.find(function(x){return x.PropertyID===id;});
+  if(!p){showToast('Property not found','error');return;}
+  document.getElementById('pdm-title').textContent=(p.BHK?p.BHK+' BHK ':'')+p.Category;
+  var b='<div class="detail-field"><span class="detail-label">Property ID</span><span class="detail-value" style="font-family:monospace">'+escHtml(p.PropertyID)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Status</span><span class="detail-value">'+availBadge(p.AvailabilityStatus)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Listing Type</span><span class="detail-value">'+escHtml(p.ListingType||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Transaction</span><span class="detail-value">'+escHtml(p.TransactionType||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Address</span><span class="detail-value">'+escHtml(p.FullAddress||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Category / BHK</span><span class="detail-value">'+escHtml(p.Category||'—')+' · '+escHtml(String(p.BHK||'—'))+' BHK</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Carpet Area</span><span class="detail-value">'+escHtml(String(p.CarpetArea||'—'))+' sqft</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Price</span><span class="detail-value" style="color:var(--primary);font-size:16px">'+fmtCur(p.Price)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Price/sqft</span><span class="detail-value">'+fmtCur(p.PricePerSqft)+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Furnishing</span><span class="detail-value">'+escHtml(p.FurnishingStatus||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Possession</span><span class="detail-value">'+escHtml(p.PossessionStatus||'—')+'</span></div>'+
+    '<div class="detail-field"><span class="detail-label">Days in Inventory</span><span class="detail-value">'+escHtml(String(p.DaysInInventory||'—'))+'</span></div>'+
+    (p.InternalRemarks?'<div class="detail-field"><span class="detail-label">Remarks</span><span class="detail-value">'+escHtml(p.InternalRemarks)+'</span></div>':'')+
+    '<div class="action-row">'+
+    '<button class="btn btn-sm btn-success" onclick="updatePropStatus(\''+id+'\',\'Available\')">✅ Available</button>'+
+    '<button class="btn btn-sm btn-warning" onclick="updatePropStatus(\''+id+'\',\'Hold\')">⏸️ Hold</button>'+
+    '<button class="btn btn-sm btn-danger" onclick="deleteProperty(\''+id+'\')">🗑️ Delete</button>'+
+    '</div>';
+  document.getElementById('pdm-body').innerHTML=b;
+  openModal('propDetailModal');
+}
+function updatePropStatus(propId,status){
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);showToast(res.success?'Status → '+status:res.message,res.success?'success':'error');if(res.success){closeModal('propDetailModal');loadInventory();}})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .updateProperty(propId,{AvailabilityStatus:status});
+}
+function deleteProperty(propId){
+  if(!confirm('Delete this property?'))return;
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);showToast(res.success?'Deleted':res.message,res.success?'success':'error');if(res.success){closeModal('propDetailModal');loadInventory();}})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .deleteProperty(propId);
+}
+function saveProperty(){
+  var lt=val('ap-lt');
+  var data={ListingType:lt,TransactionType:val('ap-tx'),Category:val('ap-cat'),BHK:val('ap-bhk'),FullAddress:val('ap-addr'),CarpetArea:val('ap-area'),FloorNumber:val('ap-floor'),Price:val('ap-price'),FurnishingStatus:val('ap-furn'),PossessionStatus:val('ap-poss'),InternalRemarks:val('ap-notes')};
+  if(lt==='Owner'){data.OwnerName=val('ap-oname');data.OwnerPhone=val('ap-ophone');}else{data.BrokerName=val('ap-oname');data.BrokerPhone=val('ap-ophone');}
+  if(!data.FullAddress||!data.Price){showToast('Address & Price required','error');return;}
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);if(res.success){showToast('Added: '+(res.data&&res.data.PropertyID),'success');closeModal('addPropertyModal');loadInventory();}else showToast(res.message,'error');})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .createProperty(data);
+}
+
+// ── AGENT MODULE
+function agentTab(tab,el){
+  document.querySelectorAll('#page-agent .tab').forEach(function(t){t.classList.remove('active');});
+  ['Dena','Lena','Projects'].forEach(function(t){document.getElementById('agent'+t).style.display='none';});
+  if(el)el.classList.add('active');
+  document.getElementById('agent'+tab).style.display='block';
+  if(tab==='Projects')loadProjects();
+}
+function toggleDenaLabel(){document.getElementById('denaContactLabel').textContent=val('d-lt')==='Agent-Broker'?'Broker Contact':'Owner Contact';}
+function submitDena(){
+  var lt=val('d-lt');
+  var data={FullAddress:val('d-addr'),Category:val('d-cat'),TransactionType:val('d-tx'),ListingType:lt,BHK:val('d-bhk'),CarpetArea:val('d-area'),Price:val('d-price'),FurnishingStatus:val('d-furn'),PossessionStatus:val('d-poss'),InternalRemarks:val('d-notes'),AgentName:currentUser&&currentUser.name};
+  if(lt==='Owner'){data.OwnerName=val('d-oname');data.OwnerPhone=val('d-ophone');}else{data.BrokerName=val('d-oname');data.BrokerPhone=val('d-ophone');}
+  if(!data.FullAddress||!data.Price){showToast('Address & Price required','error');return;}
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);showToast(res.success?'Submitted! ID: '+(res.data&&res.data.PropertyID):res.message,res.success?'success':'error');if(res.success)loadInventory();})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .agentSubmitProperty(data);
+}
+function previewRequirement(){
+  var sid=val('l-shareid').trim().toUpperCase();
+  if(!sid){showToast('Enter Share ID first','error');return;}
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);if(res.success&&res.data){var r=res.data;document.getElementById('reqPreviewBox').style.display='block';document.getElementById('reqPreviewBox').innerHTML='<strong>Requirement</strong><br>Category: '+escHtml(r.Category||'—')+'<br>BHK: '+escHtml(String(r.BHKMin||'')+(r.BHKMax?'–'+r.BHKMax:''))+'<br>Budget: '+fmtCur(r.BudgetMin)+' – '+fmtCur(r.BudgetMax)+'<br>Locations: '+escHtml([r.Location1,r.Location2].filter(Boolean).join(', ')||'—');}else showToast(res.message||'Invalid Share ID','error');})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .getSharedRequirement(sid);
+}
+function submitLena(){
+  var data={ShareID:val('l-shareid').trim().toUpperCase(),FullAddress:val('l-addr'),BHK:val('l-bhk'),Price:val('l-price'),TransactionType:'Sale',ListingType:'Agent-Broker',AgentName:val('l-agname'),AgentPhone:val('l-agphone'),InternalRemarks:val('l-notes')};
+  if(!data.ShareID||!data.FullAddress||!data.Price){showToast('Share ID, Address & Price required','error');return;}
+  showLoading(true);
+  google.script.run
+    .withSuccessHandler(function(res){showLoading(false);showToast(res.success?'Submitted successfully!':res.message,res.success?'success':'error');})
+    .withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');})
+    .agentSubmitForRequirement(data);
+}
+function loadProjects(){
+  google.script.run
+    .withSuccessHandler(function(res){var p=res&&res.success?(Array.isArray(res.data)?res.data:(res.data&&res.data.data)||[]):[];if(!p.length){setHtml('projectsList','<div class="empty-state"><div class="icon">🏗️</div><h3>No builder projects yet</h3></div>');return;}setHtml('projectsList',p.map(function(pr){return '<div class="list-item"><div class="list-avatar" style="background:#E3F2FD">🏗️</div><div class="list-body"><div class="list-name">'+escHtml(pr.ProjectName||'Unnamed')+'</div><div class="list-sub">'+escHtml(pr.BuilderCompanyName||'')+'</div><div class="list-sub">'+fmtCur(pr.PriceRangeMin)+' – '+fmtCur(pr.PriceRangeMax)+'</div></div><div style="text-align:right;font-size:12px;color:var(--text-secondary)">'+escHtml(pr.LaunchStatus||'')+'<br>'+escHtml(pr.ProjectID||'')+'</div></div>';}).join(''));})
+    .withFailureHandler(function(){setHtml('projectsList','<div class="empty-state"><div class="icon">🏗️</div><h3>No projects</h3></div>');})
+    .getAllBuilderProjects({});
+}
+
+// ── REPORTS
+function runReport(type){
+  showLoading(true);
+  var calls={
+    leads:function(cb){google.script.run.withSuccessHandler(cb).withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');}).generateLeadReport({});},
+    inventory:function(cb){google.script.run.withSuccessHandler(cb).withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');}).generateInventoryReport();},
+    revenue:function(cb){google.script.run.withSuccessHandler(cb).withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');}).generateRevenueReport('monthly');},
+    commissions:function(cb){google.script.run.withSuccessHandler(cb).withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');}).generateCommissionReport();},
+    builder:function(cb){google.script.run.withSuccessHandler(cb).withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');}).generateBuilderProjectReport();},
+    monthly:function(cb){google.script.run.withSuccessHandler(cb).withFailureHandler(function(e){showLoading(false);showToast(e.message,'error');}).generateMonthlySummary();}
+  };
+  if(!calls[type]){showLoading(false);return;}
+  calls[type](function(res){
+    showLoading(false);
+    if(!res||!res.success){showToast(res&&res.message||'Report failed','error');return;}
+    var d=res.data;
+    var html='<h3 style="margin-bottom:14px">'+(d.type||type)+'</h3>';
+    if(d.totalLeads!==undefined)html+=rStat('Total Leads',d.totalLeads);
+    if(d.totalProperties!==undefined)html+=rStat('Total Properties',d.totalProperties);
+    if(d.netCommission!==undefined)html+=rStat('Net Commission',fmtCur(d.netCommission));
+    if(d.monthlyRevenue!==undefined)html+=rStat('Monthly Revenue',fmtCur(d.monthlyRevenue));
+    if(d.staleProperties!==undefined)html+=rStat('Stale Properties',d.staleProperties);
+    if(d.totalProjects!==undefined)html+=rStat('Builder Projects',d.totalProjects);
+    if(d.byStatus)html+=rBreak('By Status',d.byStatus);
+    if(d.byListingType)html+=rBreak('By Listing Type',d.byListingType);
+    if(d.byCategory)html+=rBreak('By Category',d.byCategory);
+    if(d.bySource)html+=rBreak('By Source',d.bySource);
+    document.getElementById('reportResult').style.display='block';
+    document.getElementById('reportContent').innerHTML=html;
+    document.getElementById('reportResult').scrollIntoView({behavior:'smooth'});
+  });
+}
+function rStat(label,v){return '<div class="detail-field"><span class="detail-label">'+label+'</span><span class="detail-value">'+v+'</span></div>';}
+function rBreak(title,obj){if(!obj||typeof obj!=='object')return '';var items=Object.keys(obj).filter(function(k){return obj[k];}).map(function(k){return '<div class="pipeline-item"><span class="pipeline-stage">'+escHtml(k)+'</span><span class="pipeline-count">'+obj[k]+'</span></div>';}).join('');return '<div style="margin-top:14px"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">'+title+'</div>'+items+'</div>';}
+
+// ── PWA HINT
+if(/iPhone|iPad|Android/i.test(navigator.userAgent)){
+  window.addEventListener('load',function(){
+    setTimeout(function(){if(!localStorage.getItem('pwa_hint')){showToast('💡 Add to Home Screen for app experience!','');localStorage.setItem('pwa_hint','1');}},5000);
+  });
+}
+</script>
+</body>
+</html>
