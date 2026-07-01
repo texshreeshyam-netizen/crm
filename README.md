@@ -1,158 +1,1008 @@
-# SignatureReality CRM v1.0
-**Complete Real Estate CRM built on Google Apps Script + Google Sheets**
+# Signature Realty CRM V10
+## Enterprise Real Estate Brokerage Operating System
+
+Version: 10.0 Enterprise
+Platform: Google Apps Script + Google Sheets + HTML + CSS + JavaScript
+Architecture: Modular Enterprise Architecture
+Location: Surat, Gujarat, India
 
 ---
 
-## 🚀 Quick Setup (5 Steps)
+# PROJECT OBJECTIVE
 
-### Step 1 — Google Sheet बनाएं
-1. [Google Sheets](https://sheets.google.com) पर जाएं
-2. नई spreadsheet बनाएं: `SignatureReality-CRM-V1`
-3. Note: Sheet ID URL में मिलेगा
+Signature Realty CRM is not a simple Lead Management System.
 
-### Step 2 — Apps Script खोलें
-1. Spreadsheet में **Extensions → Apps Script** click करें
-2. सारी `.gs` files paste करें (या clasp से deploy करें)
-3. `index.html` भी paste करें
+It is a complete Enterprise Real Estate Brokerage Operating System designed for 5–10 users initially and scalable for future migration to Cloud SQL/PostgreSQL without changing business workflows.
 
-### Step 3 — पहली बार Setup करें
-1. Apps Script editor में `setupCRM` function run करें
-2. Default Admin बन जाएगा:
-   - **Email:** admin@signaturereality.com
-   - **Password:** Admin@123
-
-### Step 4 — Web App Deploy करें
-1. **Deploy → New deployment** click करें
-2. Type: **Web app** select करें
-3. Execute as: **User accessing the web app**
-4. Access: **Anyone with Google Account** (या Anyone)
-5. **Deploy** click करें
-6. URL copy करें — यही आपका CRM है!
-
-### Step 5 — Login करें
-URL खोलें और login करें। Setup complete!
+The system must be modular, configurable, secure, scalable and mobile-first.
 
 ---
 
-## 📁 File Structure
+# TEAM STRUCTURE
 
-```
-Backend (.gs files):
-├── Config.gs          — Constants & configuration
-├── Utils.gs           — Helper functions
-├── Validation.gs      — Data validation
-├── Audit.gs           — Activity logging
-├── Auth.gs            — Login, session, RBAC + doGet()
-├── Leads.gs           — Lead management (CRUD, scoring)
-├── Requirement.gs     — Lead requirements
-├── Inventory.gs       — Property management
-├── MatchingEngine.gs  — Property-lead matching
-├── SiteVisit.gs       — Site visit & GPS tracking
-├── Negotiation.gs     — Offer/counter-offer tracking
-├── TokenDeal.gs       — Token receipts & agreements
-├── Commission.gs      — Commission calculation
-├── Dashboard.gs       — KPIs & analytics
-├── Reports.gs         — Report generation
-├── Notifications.gs   — Email & WhatsApp alerts
-├── Automation.gs      — Scheduled tasks & triggers
-└── Setup.gs           — CRM initialization
+Administrator
 
-Frontend:
-└── index.html         — Complete SPA (Single Page App)
-```
+Manager
+
+Telecaller
+
+Sales Agent
+
+Inventory Executive
+
+Builder Executive
+
+Accounts Executive
+
+Marketing Executive
+
+Total Initial Users:
+5–10
 
 ---
 
-## 🗂️ Google Sheets (Auto-created by setupCRM)
+# CORE DESIGN PRINCIPLES
 
-| Sheet | Purpose |
-|-------|---------|
-| Leads | All lead records |
-| Users | User accounts |
-| Inventory | Property listings |
-| Requirements | Lead requirements |
-| Activities | Activity timeline |
-| SiteVisits | Visit records |
-| Negotiations | Negotiation tracking |
-| Tokens | Token receipts |
-| Agreements | Deal agreements |
-| Commissions | Commission records |
-| Config | System settings |
-| Permissions | RBAC rules |
-| AuditLog | Full audit trail |
-| Notifications | Notification log |
+• No Duplicate Data
 
----
+• Google Sheets works as Relational Database
 
-## 👥 Roles & Permissions
+• Every Entity has Unique ID
 
-| Role | Access |
-|------|--------|
-| **Admin** | Full access to everything |
-| **Manager** | All modules except system admin |
-| **Broker** | Leads, Inventory, Negotiations, Commissions |
-| **Agent** | Own leads, Site visits, Negotiations |
-| **Builder** | Own inventory, View leads |
+• Everything linked by IDs
 
----
+• Mobile First
 
-## ⚙️ Key Configuration (Config Sheet)
+• Config Driven
 
-| Key | Default | Description |
-|-----|---------|-------------|
-| Commission_Rate | 2.5 | Default commission % |
-| TDS_Rate | 10 | TDS deduction % |
-| GST_Rate | 18 | GST % |
-| Lead_Score_Hot | 80 | Hot lead threshold |
-| Lead_Score_Warm | 50 | Warm lead threshold |
-| Inactive_Lead_Days | 30 | Days before inactive alert |
-| Company_Email | — | Admin notification email |
-| WhatsApp_API_Key | — | WhatsApp Business API key |
+• Metadata Driven
+
+• Dynamic Forms
+
+• Dynamic Workflow
+
+• Dynamic Permissions
+
+• Audit Everything
+
+• Timeline Everything
+
+• Automation Everywhere
+
+• Backward Compatible
 
 ---
 
-## 🔄 Automation (Triggers)
+# MASTER WORKFLOW
 
-Run `setupTriggers()` once to enable:
+SYSTEM SETUP
 
-| Trigger | Frequency | Action |
-|---------|-----------|--------|
-| `hourlyTask` | Every hour | Run matching engine |
-| `dailyMorningTask` | 8 AM daily | Reminders, alerts, reports |
-| `dailyCleanupTask` | 2 AM daily | Backup, cleanup |
-| `weeklyReportTask` | Monday 9 AM | Weekly report email |
+↓
+
+Masters
+
+↓
+
+Users
+
+↓
+
+Permissions
+
+↓
+
+Lead Management
+
+↓
+
+Requirement
+
+↓
+
+Matching
+
+↓
+
+Shortlist
+
+↓
+
+Property Sharing
+
+↓
+
+Site Visit
+
+↓
+
+Negotiation
+
+↓
+
+Token
+
+↓
+
+Agreement
+
+↓
+
+Registry
+
+↓
+
+Commission
+
+↓
+
+After Sales
+
+↓
+
+Renewal
+
+↓
+
+Reports
+
+↓
+
+Dashboard
 
 ---
 
-## 🎯 Lead Scoring
+# LEAD MANAGEMENT
 
-| Factor | Max Points |
-|--------|-----------|
-| Budget range | 25 |
-| Urgency level | 25 |
-| Credibility (email, source) | 25 |
-| Engagement (location, type, timeline) | 25 |
-| **Total** | **100** |
+Lead Entry
 
-- 🔴 **Hot:** 80-100
-- 🟡 **Warm:** 50-79
-- 🔵 **Cold:** 0-49
+↓
+
+Duplicate Check
+
+↓
+
+Lead Verification
+
+↓
+
+Lead Score
+
+↓
+
+Assignment
+
+↓
+
+Telecalling
+
+↓
+
+Interested
+
+↓
+
+Dynamic Requirement Form
+
+↓
+
+Requirement Validation
+
+↓
+
+Requirement Complete
+
+↓
+
+Requirement Lock
+
+↓
+
+Audit
+
+↓
+
+Timeline
+
+↓
+
+Auto Matching
 
 ---
 
-## 💰 Commission Formula
+# MATCHING ENGINE
 
-```
-Gross = Sale Price × Rate%
-TDS   = Gross × 10%
-GST   = Gross × 18%
-Net   = Gross - TDS - GST
-Agent = Net × Agent%
-```
+Search Internal Inventory
+
+↓
+
+Builder Inventory
+
+↓
+
+Owner Inventory
+
+↓
+
+Agent Inventory
+
+↓
+
+Calculate Match Score
+
+↓
+
+AI Recommendation Ready
+
+↓
+
+Auto Shortlist
+
+↓
+
+Manual Shortlist
+
+↓
+
+Requirement Sharing
+
+(Client Hidden)
+
+↓
+
+Agent Property Submission
+
+↓
+
+Admin Approval
+
+↓
+
+Inventory Update
+
+↓
+
+Client Sharing
+
+↓
+
+Property Follow-up
 
 ---
 
-## 📞 Support
-**Project:** SignatureReality CRM v1.0  
-**Built:** Google Apps Script + Google Sheets  
-**Language:** JavaScript (ES5 compatible for GAS)
+# SITE VISIT
+
+Visit Request
+
+↓
+
+Schedule
+
+↓
+
+Reminder
+
+↓
+
+Check-in
+
+↓
+
+Visit Complete
+
+↓
+
+Feedback
+
+↓
+
+Reject
+
+↓
+
+Revisit
+
+↓
+
+Interested
+
+↓
+
+Negotiation
+
+---
+
+# NEGOTIATION
+
+Offer
+
+↓
+
+Counter Offer
+
+↓
+
+Approval
+
+↓
+
+Final Deal
+
+↓
+
+Token
+
+---
+
+# TOKEN
+
+Dynamic Token
+
+↓
+
+Payment Entry
+
+↓
+
+Receipt
+
+↓
+
+Property Hold
+
+↓
+
+Accounts Verification
+
+↓
+
+Agreement
+
+---
+
+# AGREEMENT
+
+Dynamic Agreement
+
+↓
+
+Documents
+
+↓
+
+PDF
+
+↓
+
+Digital Signature Ready
+
+↓
+
+Agreement Complete
+
+---
+
+# SALE FLOW
+
+Agreement
+
+↓
+
+Registry
+
+↓
+
+Commission
+
+↓
+
+Brokerage Split
+
+↓
+
+Accounts Settlement
+
+↓
+
+Deal Closed
+
+---
+
+# RENT FLOW
+
+Agreement Running
+
+↓
+
+Renewal Reminder
+
+90
+
+60
+
+30
+
+15
+
+7
+
+Expiry
+
+↓
+
+Renew
+
+OR
+
+Vacate
+
+↓
+
+Inventory Available
+
+---
+
+# AFTER SALES
+
+Customer Follow-up
+
+↓
+
+Referral
+
+↓
+
+Review
+
+↓
+
+Repeat Business
+
+↓
+
+Festival Wishes
+
+↓
+
+Birthday Wishes
+
+↓
+
+Anniversary Wishes
+
+---
+
+# MODULES
+
+Dashboard
+
+Lead
+
+Requirement
+
+Inventory
+
+Builder
+
+Projects
+
+Owner
+
+Investor
+
+Matching Engine
+
+Shortlist
+
+Property Sharing
+
+Site Visit
+
+Follow-up
+
+Negotiation
+
+Token
+
+Agreement
+
+Registry
+
+Commission
+
+Accounts
+
+Reports
+
+Automation
+
+Notification
+
+Audit
+
+Timeline
+
+Settings
+
+Users
+
+Roles
+
+Masters
+
+Backup
+
+Logs
+
+AI Engine
+
+---
+
+# DYNAMIC FORM ENGINE
+
+Every business form must be generated dynamically.
+
+Never hardcode business forms.
+
+Supported Dynamic Forms
+
+Lead
+
+Requirement
+
+Inventory
+
+Builder
+
+Owner
+
+Project
+
+Site Visit
+
+Negotiation
+
+Token
+
+Agreement
+
+Registry
+
+Commission
+
+Settings
+
+---
+
+# REQUIREMENT FORM
+
+Requirement Form must be generated using FormSchema.
+
+Depends On
+
+Transaction Type
+
+Property Category
+
+Property Subcategory
+
+Workflow Stage
+
+User Role
+
+Company Configuration
+
+No hardcoded fields allowed.
+
+---
+
+# MATCHING ENGINE
+
+Internal Inventory
+
+Builder Inventory
+
+Owner Inventory
+
+Agent Inventory
+
+AI Ready
+
+Configurable Match Score
+
+Auto Refresh
+
+Auto Re-match
+
+Manual Override
+
+---
+
+# SHORTLIST AUTOMATION
+
+Requirement Complete
+
+↓
+
+Matching
+
+↓
+
+Auto Shortlist
+
+↓
+
+Agent Review
+
+↓
+
+Admin Approval
+
+↓
+
+Client Share
+
+↓
+
+Follow-up
+
+↓
+
+Visit
+
+---
+
+# AUTOMATION ENGINE
+
+Lead Assignment
+
+Requirement Matching
+
+Reminder
+
+WhatsApp
+
+Email
+
+Task Creation
+
+Renewal Reminder
+
+Backup
+
+Reports
+
+Escalation
+
+Dashboard Refresh
+
+---
+
+# APPROVAL ENGINE
+
+Inventory Approval
+
+Builder Approval
+
+Token Approval
+
+Commission Approval
+
+Discount Approval
+
+Agreement Approval
+
+---
+
+# DOCUMENT MANAGEMENT
+
+Photos
+
+Videos
+
+PDF
+
+Agreement
+
+Registry
+
+PAN
+
+Aadhaar
+
+RERA
+
+Brochure
+
+Floor Plan
+
+---
+
+# PERMISSION ENGINE
+
+Administrator
+
+Manager
+
+Telecaller
+
+Sales Agent
+
+Inventory Executive
+
+Builder Executive
+
+Accounts Executive
+
+Marketing Executive
+
+Every screen permission driven.
+
+---
+
+# AUDIT
+
+Every Create
+
+Every Update
+
+Every Delete
+
+Every Share
+
+Every Approval
+
+Every Login
+
+Every Export
+
+Every Payment
+
+---
+
+# TIMELINE
+
+Lead Timeline
+
+Requirement Timeline
+
+Inventory Timeline
+
+Visit Timeline
+
+Negotiation Timeline
+
+Token Timeline
+
+Agreement Timeline
+
+Registry Timeline
+
+Commission Timeline
+
+---
+
+# DATA GOVERNANCE
+
+Soft Delete
+
+Archive Policy
+
+Retention Policy
+
+PII Masking
+
+Consent Tracking
+
+DPDP Ready
+
+Export Data
+
+Delete Data
+
+Backup Policy
+
+---
+
+# CONCURRENCY
+
+LockService
+
+Conflict Detection
+
+Optimistic Concurrency
+
+Duplicate Prevention
+
+Batch Processing
+
+---
+
+# SEARCH
+
+Global Search
+
+Prefix Search
+
+Cached Search
+
+Lookup Index
+
+Advanced Filters
+
+---
+
+# OBSERVABILITY
+
+INFO
+
+WARNING
+
+ERROR
+
+CRITICAL
+
+Automation Logs
+
+API Logs
+
+Health Dashboard
+
+Trigger Monitor
+
+---
+
+# SECURITY
+
+RBAC
+
+Session Control
+
+CSRF Protection
+
+XSS Protection
+
+Sanitization
+
+Device Tracking
+
+IP Logging
+
+Failed Login Alerts
+
+Audit Trail
+
+---
+
+# CONFIGURATION
+
+Runtime Config
+
+Feature Toggle
+
+Workflow Config
+
+Business Rules
+
+Environment
+
+Development
+
+Testing
+
+Production
+
+---
+
+# TESTING
+
+Unit Testing
+
+Integration Testing
+
+Regression Testing
+
+Smoke Testing
+
+Performance Testing
+
+Security Testing
+
+User Acceptance Testing
+
+Deployment Checklist
+
+---
+
+# VERSION CONTROL
+
+Git
+
+Release Tags
+
+Apps Script Versions
+
+Rollback
+
+Migration
+
+Replit Sync
+
+---
+
+# AI ROADMAP
+
+AI Lead Score
+
+AI Matching
+
+AI Search
+
+AI Call Summary
+
+AI WhatsApp Summary
+
+AI Report Generator
+
+AI Revenue Forecast
+
+Voice To CRM
+
+---
+
+# ENGINEERING RULES
+
+Never rewrite working modules.
+
+Always extend architecture.
+
+Never duplicate business logic.
+
+Never duplicate data.
+
+Always validate before write.
+
+Always create Audit.
+
+Always create Timeline.
+
+Always update Dashboard.
+
+Always support Automation.
+
+Always return standard JSON response.
+
+Always document before coding.
+
+---
+
+# FUTURE ROADMAP
+
+Multi Branch
+
+Multi Company
+
+Cloud SQL Migration
+
+PostgreSQL Migration
+
+REST API
+
+Webhooks
+
+ERP Integration
+
+Accounting Integration
+
+AI Native Architecture
+
+Enterprise Analytics
+
+---
+
+Signature Realty CRM V10
+
+Enterprise Real Estate Brokerage Operating System
+
+Designed for Surat Real Estate Business
+
+Production-Oriented Architecture
